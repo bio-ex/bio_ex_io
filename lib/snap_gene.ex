@@ -110,7 +110,8 @@ defmodule Bio.IO.SnapGene do
     end
   end
 
-  defp parse(<<>>, output, _module), do: output
+  @spec parse(binary(), output :: term(), module :: module()) :: term()
+  def parse(<<>>, output \\ %{}, _module), do: output
 
   # A SnapGene file is made of packets, each packet being a Type-Length-Value
   # structure comprising:
@@ -120,7 +121,7 @@ defmodule Bio.IO.SnapGene do
   #   - the actual data.
   # perfect case for binary pattern matching if there ever was one
   # https://en.wikipedia.org/wiki/Type%E2%80%93length%E2%80%93value)
-  defp parse(data, output, module) do
+  def parse(data, output \\ %{}, module \\ Bio.IO.SequenceTuple) do
     <<packet_type::size(8), content::binary>> = data
     <<packet_length::size(32), content::binary>> = content
     <<packet::binary-size(packet_length), content::binary>> = content
