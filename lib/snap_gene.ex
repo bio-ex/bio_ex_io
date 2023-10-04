@@ -100,17 +100,27 @@ defmodule Bio.IO.SnapGene do
 
   You can use `:file.format_error/1` to get a descriptive string of the error.
   """
-  @spec read(filename :: Path.t(), opts :: keyword()) :: {:ok, struct()} | {:error, File.posix()}
+  @spec read(filename :: Path.t(), opts :: keyword()) :: {:ok, __MODULE__%{}} | {:error, File.posix()}
   def read(filename, opts \\ []) do
     sequence_module = Keyword.get(opts, :sequence_type, Bio.IO.SequenceTuple)
 
     case File.read(filename) do
-      {:ok, content} -> {:ok, struct(__MODULE__, parse(content, %{}, sequence_module))}
+      {:ok, content} -> {:ok, struct(__MODULE__, do_parse(content, %{}, sequence_module))}
       not_ok -> not_ok
     end
   end
 
-  defp parse(<<>>, output, _module), do: output
+  @doc"""
+  Similar to read/2 except that it takes a binary instead of a file path.
+  """
+  @spec parse(content :: binary(), opts :: keyword()) :: {:ok, __MODULE__%{}}
+  def parse(content, opts \\ []) do
+    sequence_module = Keyword.get(opts, :sequence_type, Bio.IO.SequenceTuple)
+
+    {:ok, struct(__MODULE__, do_parse(content, %{}, sequence_module))}
+  end
+
+  defp do_parse(<<>>, output, _module), do: output
 
   # A SnapGene file is made of packets, each packet being a Type-Length-Value
   # structure comprising:
@@ -120,7 +130,7 @@ defmodule Bio.IO.SnapGene do
   #   - the actual data.
   # perfect case for binary pattern matching if there ever was one
   # https://en.wikipedia.org/wiki/Type%E2%80%93length%E2%80%93value)
-  defp parse(data, output, module) do
+  defp do_parse(data, output, module) do
     <<packet_type::size(8), content::binary>> = data
     <<packet_length::size(32), content::binary>> = content
     <<packet::binary-size(packet_length), content::binary>> = content
@@ -128,23 +138,23 @@ defmodule Bio.IO.SnapGene do
     case packet_type do
       @sequence ->
         new_output = Map.merge(output, parse_sequence(packet, module))
-        parse(content, new_output, module)
+        do_parse(content, new_output, module)
 
       @primers ->
-        parse(content, Map.merge(output, parse_primers(packet)), module)
+        do_parse(content, Map.merge(output, parse_primers(packet)), module)
 
       @notes ->
-        parse(content, Map.merge(output, parse_notes(packet)), module)
+        do_parse(content, Map.merge(output, parse_notes(packet)), module)
 
       @cookie ->
-        parse(content, Map.merge(output, parse_cookie(packet)), module)
+        do_parse(content, Map.merge(output, parse_cookie(packet)), module)
 
       @features ->
         new_output = Map.merge(output, parse_features(packet))
-        parse(content, new_output, module)
+        do_parse(content, new_output, module)
 
       _ ->
-        parse(content, output, module)
+        do_parse(content, output, module)
     end
   end
 
