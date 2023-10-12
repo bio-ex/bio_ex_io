@@ -100,7 +100,8 @@ defmodule Bio.IO.SnapGene do
 
   You can use `:file.format_error/1` to get a descriptive string of the error.
   """
-  @spec read(filename :: Path.t(), opts :: keyword()) :: {:ok, __MODULE__%{}} | {:error, File.posix()}
+  @spec read(filename :: Path.t(), opts :: keyword()) ::
+          {:ok, %__MODULE__{}} | {:error, File.posix()}
   def read(filename, opts \\ []) do
     sequence_module = Keyword.get(opts, :sequence_type, Bio.IO.SequenceTuple)
 
@@ -110,11 +111,12 @@ defmodule Bio.IO.SnapGene do
     end
   end
 
-  @doc"""
-  Similar to read/2 except that it takes a binary instead of a file path.
+  @doc """
+  Produces the same output as `read/2`, but presumes that the file contents are
+  loaded into a binary.
   """
-  @spec parse(content :: binary(), opts :: keyword()) :: {:ok, __MODULE__%{}}
-  def parse(content, opts \\ []) do
+  @spec from_binary(content :: binary(), opts :: keyword()) :: {:ok, %__MODULE__{}}
+  def from_binary(content, opts \\ []) do
     sequence_module = Keyword.get(opts, :sequence_type, Bio.IO.SequenceTuple)
 
     {:ok, struct(__MODULE__, do_parse(content, %{}, sequence_module))}

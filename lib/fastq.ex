@@ -79,9 +79,14 @@ defmodule Bio.IO.FastQ do
 
     case char do
       # Skip @ and continue as header
-      "@" -> parse(rest, value, acc, :header, type, scoring)
-      "\n" -> parse(rest, "", [value | acc], :sequence, type, scoring)
-      _ -> parse(rest, value <> char, acc, :header, type, scoring)
+      "@" ->
+        parse(rest, value, acc, :header, type, scoring)
+
+      c when c in ["\n", "\r"] ->
+        parse(rest, "", [value | acc], :sequence, type, scoring)
+
+      _ ->
+        parse(rest, value <> char, acc, :header, type, scoring)
     end
   end
 
@@ -89,8 +94,8 @@ defmodule Bio.IO.FastQ do
     <<char::binary-size(1), rest::binary>> = content
 
     case char do
-      # Skip newlines
-      "\n" ->
+      # Skip newlines/carriage return
+      c when c in ["\n", "\r"] ->
         parse(rest, value, acc, :sequence, type, scoring)
 
       # Skip plus and send into scoring

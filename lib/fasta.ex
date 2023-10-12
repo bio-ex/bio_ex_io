@@ -191,7 +191,7 @@ defmodule Bio.IO.Fasta do
 
     case char do
       ">" -> parse(rest, value, acc, :header, type, header_fn)
-      "\n" -> parse(rest, "", [value | acc], :sequence, type, header_fn)
+      c when c in ["\n", "\r"] -> parse(rest, "", [value | acc], :sequence, type, header_fn)
       _ -> parse(rest, value <> char, acc, :header, type, header_fn)
     end
   end
@@ -201,7 +201,7 @@ defmodule Bio.IO.Fasta do
 
     case char do
       ">" -> parse(rest, "", [value | acc], :header, type, header_fn)
-      "\n" -> parse(rest, value, acc, :sequence, type, header_fn)
+      c when c in ["\n", "\r"] -> parse(rest, value, acc, :sequence, type, header_fn)
       _ -> parse(rest, value <> char, acc, :sequence, type, header_fn)
     end
   end
