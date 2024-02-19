@@ -46,7 +46,7 @@ defmodule Bio.IO.SnapGene do
   you have a terminator feature as the first feature and you want to get the
   segment range:
 
-      iex>{:ok, sample} = SnapGene.read("test/snap_gene/sample-e.dna")
+      iex>{:ok, sample} = SnapGene.read("test/files/sample-e.dna")
       ...>:xmerl_xpath.string('string(/*/Feature[1]/Segment/@range)', sample.features)
       {:xmlObj, :string, '400-750'}
 
@@ -54,7 +54,7 @@ defmodule Bio.IO.SnapGene do
   for example whether or not a range is exclusive or inclusive on either end.
   Attempting to access a node that doesn't exist will return an empty array.
 
-      iex>{:ok, sample} = SnapGene.read("test/snap_gene/sample-e.dna")
+      iex>{:ok, sample} = SnapGene.read("test/files/sample-e.dna")
       ...>:xmerl_xpath.string('string(/*/Feature[1]/Unknown/Path/@range)', sample.features)
       {:xmlObj, :string, []}
 
@@ -67,14 +67,14 @@ defmodule Bio.IO.SnapGene do
   in this way though. For example, if I wanted to know how many Feature Segments
   there were:
 
-      iex>{:ok, sample} = SnapGene.read("test/snap_gene/sample-e.dna")
+      iex>{:ok, sample} = SnapGene.read("test/files/sample-e.dna")
       ...>:xmerl_xpath.string('count(/*/Feature/Segment)', sample.features)
       {:xmlObj, :number, 2}
 
   Now it's a simple matter to map over the desired queries to build up some data
   from the XML:
 
-      iex>{:ok, sample} = SnapGene.read("test/snap_gene/sample-e.dna")
+      iex>{:ok, sample} = SnapGene.read("test/files/sample-e.dna")
       ...>Enum.map(1..2, fn i -> :xmerl_xpath.string('string(/*/Feature[#{i}]/Segment/@range)', sample.features) end)
       [{:xmlObj, :string, '400-750'},{:xmlObj, :string, '161-241'}]
 

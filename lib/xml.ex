@@ -1,5 +1,7 @@
 defmodule Bio.XML do
   # TODO: should I expose this? it's mostly test helpers
+  # TODO: Actually, I think that I could create a Macro based DSL to help out
+  # with this, similar to queries in Explorer.
   @moduledoc false
 
   @doc """
@@ -45,7 +47,7 @@ defmodule Bio.XML do
   charlist.
   """
   def str(doc, path) do
-    {_, _, value} = :xmerl_xpath.string('string(#{path})', doc)
+    {_, _, value} = :xmerl_xpath.string(~c"string(#{path})", doc)
     List.to_string(value)
   end
 
@@ -64,7 +66,7 @@ defmodule Bio.XML do
     iex> Bio.XML.read('that_file.xml') |> Bio.XML.get('/*/Thing/@name') |> Enum.map(&Bio.XML.root_str/1)
   """
   def root_str(doc) do
-    str(doc, '/*')
+    str(doc, ~c"/*")
   end
 
   @doc """

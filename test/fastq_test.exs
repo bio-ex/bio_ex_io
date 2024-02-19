@@ -19,7 +19,7 @@ defmodule BioIOFastqTest do
       }
     ]
 
-    {:ok, content} = Subject.read('test/fastq/fastq_1.fastq')
+    {:ok, content} = Subject.read(~c"test/files/fastq_1.fastq")
 
     assert content == expected
   end
@@ -36,7 +36,7 @@ defmodule BioIOFastqTest do
       }
     ]
 
-    {:ok, content} = Subject.read('test/fastq/fastq_1.fastq', type: DnaStrand)
+    {:ok, content} = Subject.read(~c"test/files/fastq_1.fastq", type: DnaStrand)
 
     assert content == expected
   end
@@ -53,7 +53,7 @@ defmodule BioIOFastqTest do
       }
     ]
 
-    {:ok, content} = Subject.read('test/fastq/fastq_1.fastq', type: Bio.Sequence)
+    {:ok, content} = Subject.read(~c"test/files/fastq_1.fastq", type: Bio.Sequence)
 
     assert content == expected
   end

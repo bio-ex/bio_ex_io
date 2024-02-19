@@ -69,8 +69,8 @@ defmodule Bio.IO.Fasta do
 
   ## Examples
 
-    iex>Bio.IO.Fasta.read("test/fasta/test_1.fasta")
-    {:ok, [{"header1", "ataatatgatagtagatagatagtcctatga"}]}
+      iex>Bio.IO.Fasta.read("test/files/test_1.fasta")
+      {:ok, [{"header1", "ataatatgatagtagatagatagtcctatga"}]}
   """
   @spec read(filename :: Path.t(), opts :: [read_opts]) :: {:ok, any()} | {:error, File.posix()}
   def read(filename, opts \\ []) do
@@ -139,8 +139,8 @@ defmodule Bio.IO.Fasta do
   ```
 
   ## Examples
-      iex> Fasta.write("/tmp/test_file.fasta", ["header", "sequence", "header2", "sequence2"])
-      :ok
+        iex> Fasta.write("/tmp/test_file.fasta", ["header", "sequence", "header2", "sequence2"])
+        :ok
 
   Will return error types in common with `File.write/3`
   """
