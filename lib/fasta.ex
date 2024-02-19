@@ -71,6 +71,48 @@ defmodule Bio.IO.Fasta do
 
       iex>Bio.IO.Fasta.read("test/files/test_1.fasta")
       {:ok, [{"header1", "ataatatgatagtagatagatagtcctatga"}]}
+
+  Or if you want to alter the headers:
+
+      iex>change_header = fn header ->
+      ...>  header
+      ...>  |> String.replace("1", "_1")
+      ...>  |> String.replace("header", "sample")
+      ...> end
+      ...>Bio.IO.Fasta.read("test/files/test_1.fasta", parse_header: change_header)
+      {:ok, [{"sample_1", "ataatatgatagtagatagatagtcctatga"}]}
+
+  Headers aren't really restricted by the FASTA spec. So it's not too hard to
+  come up with more complex schemes. For example, let's assume you have
+  key/value pairs separated by `|` (pipe) characters, something like
+
+  ``` string
+  >sample_name:this thing|accession_id:WP_6549191.1|genus:Escherichia|species:coli
+  ```
+
+  could be parsed as such:
+
+      iex> parse_parts = fn header ->
+      ...>   header
+      ...>   |> String.split("|")
+      ...>   |> Enum.reduce(%{}, fn kv_pair, map ->
+      ...>     [key, value] = String.split(kv_pair, ":")
+      ...>     Map.put(map, key, value)
+      ...>   end)
+      ...> end
+      ...> Bio.IO.Fasta.read("test/files/complex_headers.fasta", parse_header: parse_parts)
+      {
+       :ok,
+       [{
+         %{
+          "accession_id" => "WP_6549191.1",
+          "genus" => "Escherichia",
+          "species" => "coli",
+          "sample_name" => "this thing",
+          },
+         "ataatatgatagtagatagatagtcctatga"
+       }]
+      }
   """
   @spec read(filename :: Path.t(), opts :: [read_opts]) :: {:ok, any()} | {:error, File.posix()}
   def read(filename, opts \\ []) do

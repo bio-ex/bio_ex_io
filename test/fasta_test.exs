@@ -50,6 +50,10 @@ defmodule BioIOFastaTest.Read do
     end
   end
 
+  test "read fails gracefully on poor formatting" do
+    assert {:error, _} = Subject.read("test/files/malformed.fasta")
+  end
+
   test "allows injecting callable to massage header data" do
     {:ok, content} =
       Subject.read("test/files/test_1.fasta",
